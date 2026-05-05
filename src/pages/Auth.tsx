@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { AvatarPicker } from '../components/AvatarPicker';
 import { Gamepad2, Lock, User, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -15,7 +16,12 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { refreshProfile } = useAuth();
+  const { user, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+
+  if (user) {
+    return <Navigate to="/lobby" replace />;
+  }
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +46,7 @@ export default function AuthPage() {
           throw new Error('Giriş başarısız. Kullanıcı adı veya şifre hatalı.');
         }
         playSound('success');
+        navigate('/lobby');
       } else {
         if (username.length < 3) throw new Error('Kullanıcı adı en az 3 karakter olmalıdır.');
         
@@ -73,6 +80,7 @@ export default function AuthPage() {
 
         playSound('success');
         await refreshProfile();
+        navigate('/lobby');
       }
     } catch (err: any) {
       setError(err.message);
