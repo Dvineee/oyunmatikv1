@@ -87,9 +87,20 @@ export default function RoomPage() {
       playSound('success');
     });
 
+    socket.on('player_left', (data) => {
+      setPlayers(prev => prev.filter(p => p.id !== data.userId));
+    });
+
+    socket.on('error', (msg) => {
+      alert(msg);
+      navigate('/lobby');
+    });
+
     return () => {
       socket.off('new_message');
       socket.off('player_joined');
+      socket.off('player_left');
+      socket.off('error');
     };
   }, [roomId, navigate, user]);
 
@@ -104,7 +115,6 @@ export default function RoomPage() {
     if (!newMessage.trim() || !user || !roomId) return;
 
     socket.emit('send_message', {
-      roomId,
       content: newMessage.trim()
     });
     setNewMessage('');
@@ -112,6 +122,7 @@ export default function RoomPage() {
   };
 
   const leaveRoom = () => {
+    socket.emit('leave_room');
     navigate('/lobby');
   };
 

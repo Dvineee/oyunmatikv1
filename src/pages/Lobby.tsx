@@ -52,10 +52,17 @@ export default function LobbyPage() {
       navigate(`/room/${data.id}`);
     });
 
+    socket.on('error', (msg) => {
+      alert(msg);
+      setLoading(false);
+      setCreateLoading(false);
+    });
+
     return () => {
       socket.off('rooms_updated');
       socket.off('online_users');
       socket.off('room_created');
+      socket.off('error');
     };
   }, []);
 

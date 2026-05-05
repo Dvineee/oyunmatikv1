@@ -116,9 +116,39 @@ app.get('/api/rooms', (req, res) => {
 
 // WebSocket İşlemleri
 const onlineUsers = new Map();
+const lastActionTimes = new Map(); // Giriş-çıkış gecikmesi için
 
 io.on('connection', (socket) => {
   let currentUser: any = null;
+  let currentRoomId: string | null = null;
+
+  const leaveCurrentRoom = () => {
+    if (currentUser && currentRoomId) {
+      const room = db.prepare('SELECT * FROM rooms WHERE id = ?').get(currentRoomId) as any;
+      if (room) {
+        const newCount = Math.max(0, room.player_count - 1);
+        db.prepare('UPDATE rooms SET player_count = ? WHERE id = ?').run(newCount, currentRoomId);
+        
+        socket.leave(currentRoomId);
+        io.to(currentRoomId).emit('player_left', { userId: currentUser.id });
+        io.emit('rooms_updated');
+
+        // ODA OTOMATİK SİLME: Eğer oda boşaldıysa sil
+        if (newCount === 0) {
+          setTimeout(() => {
+            const checkRoom = db.prepare('SELECT player_count FROM rooms WHERE id = ?').get(currentRoomId) as any;
+            if (checkRoom && checkRoom.player_count === 0) {
+              db.prepare('DELETE FROM rooms WHERE id = ?').run(currentRoomId);
+              db.prepare('DELETE FROM messages WHERE room_id = ?').run(currentRoomId);
+              io.emit('rooms_updated');
+              console.log(`Oda silindi: ${currentRoomId} (Boş kaldığı için)`);
+            }
+          }, 5000); // 5 saniye bekle, hala boşsa sil
+        }
+      }
+      currentRoomId = null;
+    }
+  };
 
   socket.on('auth', (token) => {
     try {
@@ -133,35 +163,63 @@ io.on('connection', (socket) => {
 
   socket.on('create_room', (data) => {
     if (!currentUser) return;
+    
+    const now = Date.now();
+    const lastAction = lastActionTimes.get(currentUser.id) || 0;
+    if (now - lastAction < 2000) return socket.emit('error', 'Çok hızlı işlem yapıyorsunuz!');
+    lastActionTimes.set(currentUser.id, now);
+
     const roomId = Math.random().toString(36).substring(2, 11);
     db.prepare('INSERT INTO rooms (id, name, host_id, max_players, player_count) VALUES (?, ?, ?, ?, ?)')
       .run(roomId, data.name, currentUser.id, data.maxPlayers, 1);
     
+    currentRoomId = roomId;
     socket.join(roomId);
     socket.emit('room_created', { id: roomId });
     io.emit('rooms_updated');
   });
 
   socket.on('join_room', (roomId) => {
-    if (!currentUser) return;
+    if (!currentUser || currentRoomId === roomId) return;
+
+    const now = Date.now();
+    const lastAction = lastActionTimes.get(currentUser.id) || 0;
+    if (now - lastAction < 2000) return socket.emit('error', 'Lütfen biraz bekleyin!');
+    lastActionTimes.set(currentUser.id, now);
+
+    if (currentRoomId) leaveCurrentRoom();
+
     const room = db.prepare('SELECT * FROM rooms WHERE id = ?').get(roomId) as any;
     if (room && room.player_count < room.max_players) {
       db.prepare('UPDATE rooms SET player_count = player_count + 1 WHERE id = ?').run(roomId);
+      currentRoomId = roomId;
       socket.join(roomId);
       io.to(roomId).emit('player_joined', { user: currentUser });
       io.emit('rooms_updated');
+    } else {
+      socket.emit('error', 'Oda dolu veya kapalı.');
     }
   });
 
+  socket.on('leave_room', () => {
+    const now = Date.now();
+    if (currentUser) {
+      const lastAction = lastActionTimes.get(currentUser.id) || 0;
+      if (now - lastAction < 1000) return;
+      lastActionTimes.set(currentUser.id, now);
+    }
+    leaveCurrentRoom();
+  });
+
   socket.on('send_message', (data) => {
-    if (!currentUser) return;
+    if (!currentUser || !currentRoomId) return;
     const msgId = Math.random().toString(36).substring(2, 11);
     db.prepare('INSERT INTO messages (id, room_id, user_id, content) VALUES (?, ?, ?, ?)')
-      .run(msgId, data.roomId, currentUser.id, data.content);
+      .run(msgId, currentRoomId, currentUser.id, data.content);
     
-    io.to(data.roomId).emit('new_message', {
+    io.to(currentRoomId).emit('new_message', {
       id: msgId,
-      room_id: data.roomId,
+      room_id: currentRoomId,
       user_id: currentUser.id,
       username: currentUser.username,
       avatar_url: currentUser.avatar_id,
@@ -171,11 +229,18 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
+    leaveCurrentRoom();
     if (currentUser) {
       onlineUsers.delete(currentUser.id);
+      lastActionTimes.delete(currentUser.id);
       io.emit('online_users', Array.from(onlineUsers.values()));
     }
   });
+});
+
+// API 404 handler (Vite'a düşmeden önce)
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'İstenen API rotası bulunamadı.' });
 });
 
 async function startServer() {

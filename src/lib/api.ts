@@ -14,7 +14,18 @@ export const api = {
         'Authorization': `Bearer ${token}`
       }
     });
-    if (!res.ok) throw new Error('API hatası');
+
+    if (!res.ok) {
+      let errorMessage = 'API hatası';
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // JSON değilse body'yi metin olarak almayı deneyebiliriz veya varsayılan hata döneriz
+      }
+      throw new Error(errorMessage);
+    }
+
     return res.json();
   },
 
@@ -26,8 +37,18 @@ export const api = {
       },
       body: JSON.stringify(data)
     });
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'İşlem başarısız');
-    return result;
+
+    if (!res.ok) {
+      let errorMessage = 'İşlem başarısız';
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch (e) {
+        // HTML hata sayfası gelirse buraya düşer
+      }
+      throw new Error(errorMessage);
+    }
+
+    return res.json();
   }
 };
