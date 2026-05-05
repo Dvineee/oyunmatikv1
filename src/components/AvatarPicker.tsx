@@ -1,5 +1,5 @@
 import React from 'react';
-import { AVATARS } from '../lib/supabase';
+import { AVATARS } from '../lib/constants';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { motion } from 'motion/react';
@@ -50,10 +50,11 @@ export function AvatarPicker({ selectedId, onSelect }: AvatarPickerProps) {
   );
 }
 
-export function AvatarDisplay({ avatarId, size = "md" }: { avatarId: string; size?: "sm" | "md" | "lg" }) {
+export function AvatarDisplay({ avatarId, size = "md" }: { avatarId: string; size?: "xs" | "sm" | "md" | "lg" }) {
   const avatar = AVATARS.find(a => a.id === avatarId) || AVATARS[0];
   
   const sizeClasses = {
+    xs: "w-4 h-4 text-[6px]",
     sm: "w-8 h-8 text-xs",
     md: "w-12 h-12 text-sm",
     lg: "w-20 h-20 text-lg"

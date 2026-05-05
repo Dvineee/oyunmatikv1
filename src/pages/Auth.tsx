@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { AvatarPicker } from '../components/AvatarPicker';
@@ -16,7 +15,7 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { user, refreshProfile } = useAuth();
+  const { user, signIn, signUp } = useAuth();
   const navigate = useNavigate();
 
   if (user) {
@@ -29,57 +28,15 @@ export default function AuthPage() {
     setError(null);
     playSound('click');
 
-    // Arka planda kullanılacak benzersiz e-posta mappingi için kullanıcı adını temizle
-    const sanitizedUsername = username.toLowerCase().trim().replace(/[^a-z0-9._-]/g, '');
-    const dummyEmail = `${sanitizedUsername}@oyunmatik.com`;
-
     try {
       if (isLogin) {
-        const { error: signInError } = await supabase.auth.signInWithPassword({ 
-          email: dummyEmail, 
-          password 
-        });
-        if (signInError) {
-          if (signInError.message.includes('rate limit')) {
-            throw new Error('Çok fazla deneme yapıldı. Lütfen birkaç dakika bekleyin.');
-          }
-          throw new Error('Giriş başarısız. Kullanıcı adı veya şifre hatalı.');
-        }
+        await signIn({ username, password });
         playSound('success');
         navigate('/lobby');
       } else {
         if (username.length < 3) throw new Error('Kullanıcı adı en az 3 karakter olmalıdır.');
-        
-        const { data, error: signUpError } = await supabase.auth.signUp({ 
-          email: dummyEmail, 
-          password,
-          options: {
-            data: { username, avatar_url: avatarUrl }
-          }
-        });
-        
-        if (signUpError) {
-          if (signUpError.message.includes('rate limit')) {
-            throw new Error('Kayıt limiti aşıldı. Lütfen daha sonra tekrar deneyin.');
-          }
-          throw signUpError;
-        }
-        if (!data.user) throw new Error('Kayıt işlemi başarısız oldu.');
-
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ id: data.user.id, username, avatar_url: avatarUrl }]);
-        
-        if (profileError) {
-           if (profileError.code === '23505') throw new Error('Bu kullanıcı adı zaten alınmış.');
-           if (profileError.message.includes('row-level security')) {
-             throw new Error('Sunucu yapılandırma hatası (RLS). Lütfen yöneticiye bildirin.');
-           }
-           throw profileError;
-        }
-
+        await signUp({ username, password, avatar_id: avatarUrl });
         playSound('success');
-        await refreshProfile();
         navigate('/lobby');
       }
     } catch (err: any) {

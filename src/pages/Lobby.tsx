@@ -1,28 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Users, Search, DoorOpen, LogOut, Radio, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AvatarDisplay } from '../components/AvatarPicker';
 import { playSound } from '../lib/sounds';
+import { api, socket } from '../lib/api';
 
 interface Room {
   id: string;
   name: string;
   host_id: string;
   max_players: number;
-  is_private: boolean;
   status: string;
-  player_count?: number;
-  host?: {
-    username: string;
-    avatar_url: string;
-  };
+  player_count: number;
+  host_name?: string;
+  host_avatar?: string;
 }
 
 export default function LobbyPage() {
-  const { user, profile, signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
@@ -32,105 +29,52 @@ export default function LobbyPage() {
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(4);
 
+  const fetchRooms = async () => {
+    try {
+      const data = await api.get('/api/rooms');
+      setRooms(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchRooms();
 
-    const roomSub = supabase
-      .channel('lobby-rooms')
-      .on('postgres_changes' as any, { event: '*', schema: 'public', table: 'rooms' }, () => {
-        fetchRooms();
-      })
-      .subscribe();
+    socket.on('rooms_updated', fetchRooms);
+    socket.on('online_users', (users) => {
+      setOnlineUsers(users);
+    });
 
-    const presenceChannel = supabase.channel('online-users');
-    
-    presenceChannel
-      .on('presence', { event: 'sync' }, () => {
-        const state = presenceChannel.presenceState();
-        const users = Object.values(state).flat();
-        setOnlineUsers(users);
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED' && profile) {
-          await presenceChannel.track({
-            id: profile.id,
-            username: profile.username,
-            avatar_url: profile.avatar_url,
-            online_at: new Date().toISOString(),
-          });
-        }
-      });
+    socket.on('room_created', (data) => {
+      navigate(`/room/${data.id}`);
+    });
 
     return () => {
-      roomSub.unsubscribe();
-      presenceChannel.unsubscribe();
+      socket.off('rooms_updated');
+      socket.off('online_users');
+      socket.off('room_created');
     };
-  }, [profile]);
+  }, []);
 
-  const fetchRooms = async () => {
-    const { data, error } = await supabase
-      .from('rooms')
-      .select('*, host:profiles(username, avatar_url), room_players(count)')
-      .order('created_at', { ascending: false });
-
-    if (!error && data) {
-      const formattedRooms = data.map(r => ({
-        ...r,
-        player_count: r.room_players?.[0]?.count || 0
-      }));
-      setRooms(formattedRooms);
-    }
-    setLoading(false);
-  };
-
-  const createRoom = async () => {
+  const createRoom = () => {
     if (!newRoomName || !user) return;
     setCreateLoading(true);
-
-    try {
-      const { data: room, error: roomError } = await supabase
-        .from('rooms')
-        .insert([{
-          name: newRoomName,
-          host_id: user.id,
-          max_players: maxPlayers,
-          status: 'waiting'
-        }])
-        .select()
-        .single();
-
-      if (roomError) throw roomError;
-
-      const { error: playerError } = await supabase
-        .from('room_players')
-        .insert([{ room_id: room.id, user_id: user.id }]);
-
-      if (playerError) throw playerError;
-
-      playSound('success');
-      navigate(`/room/${room.id}`);
-    } catch (err) {
-      playSound('error');
-      console.error(err);
-    } finally {
-      setCreateLoading(false);
-      setShowCreateModal(false);
-    }
+    socket.emit('create_room', { name: newRoomName, maxPlayers });
   };
 
-  const joinRoom = async (roomId: string) => {
+  const joinRoom = (roomId: string) => {
     if (!user) return;
     playSound('click');
-    const { error } = await supabase
-      .from('room_players')
-      .upsert([{ room_id: roomId, user_id: user.id }]);
-
-    if (!error) {
-      playSound('success');
-      navigate(`/room/${roomId}`);
-    } else {
-      playSound('error');
+    const room = rooms.find(r => r.id === roomId);
+    if (room && room.player_count >= room.max_players) {
+       playSound('error');
+       return;
     }
+    socket.emit('join_room', roomId);
+    navigate(`/room/${roomId}`);
   };
 
   return (
@@ -146,10 +90,10 @@ export default function LobbyPage() {
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-4 pr-8 border-r border-white/5">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-white leading-none">{profile?.username}</p>
+              <p className="text-sm font-bold text-white leading-none">{user?.username}</p>
               <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-1.5 font-bold">PROFİLİM</p>
             </div>
-            <AvatarDisplay avatarId={profile?.avatar_url || 'animal_1'} size="sm" />
+            <AvatarDisplay avatarId={user?.avatar_id || 'animal_1'} size="sm" />
           </div>
           
           <button 
@@ -176,15 +120,6 @@ export default function LobbyPage() {
               <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               YENİ ODA KUR
             </button>
-          </div>
-
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" />
-            <input 
-              type="text"
-              placeholder="Oda adına göre ara..."
-              className="w-full bg-white/5 border border-white/5 focus:bg-white/10 focus:border-indigo-500/50 outline-none rounded-2xl py-4.5 pl-14 pr-6 transition-all text-sm"
-            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -215,8 +150,8 @@ export default function LobbyPage() {
                       </div>
                       <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors truncate">{room.name}</h3>
                       <div className="flex items-center gap-2 mt-2">
-                        <div className="w-4 h-4 rounded-full bg-zinc-800" />
-                        <p className="text-[11px] text-zinc-500">Kuran: <span className="text-zinc-300 font-bold">{room.host?.username}</span></p>
+                        <AvatarDisplay avatarId={room.host_avatar || 'animal_1'} size="xs" />
+                        <p className="text-[11px] text-zinc-500">Kuran: <span className="text-zinc-300 font-bold">{room.host_name}</span></p>
                       </div>
                     </div>
                     
@@ -233,7 +168,7 @@ export default function LobbyPage() {
               ) : (
                 <div className="col-span-full py-24 text-center border-2 border-dashed border-white/5 rounded-[3rem] bg-white/[0.01]">
                    <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Gamepad2 className="w-10 h-10 text-zinc-800" />
+                     <Gamepad2 className="w-10 h-10 text-zinc-700" />
                    </div>
                    <p className="text-zinc-500 font-bold text-xs uppercase tracking-[0.3em]">Henüz aktif oda bulunmuyor</p>
                 </div>
@@ -263,7 +198,7 @@ export default function LobbyPage() {
                   className="flex items-center gap-4 group px-2 py-1"
                 >
                   <div className="relative">
-                    <AvatarDisplay avatarId={u.avatar_url} size="sm" />
+                    <AvatarDisplay avatarId={u.avatar_id} size="sm" />
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-zinc-900 shadow-lg" />
                   </div>
                   <div className="min-w-0">
@@ -293,7 +228,7 @@ export default function LobbyPage() {
               exit={{ opacity: 0, scale: 0.9, y: 40 }}
               className="w-full max-w-md bg-zinc-900 border border-white/5 p-10 rounded-[3rem] relative z-10 shadow-2xl"
             >
-              <h3 className="text-3xl font-black mb-8 italic tracking-tighter">ODA OLUŞTUR</h3>
+              <h3 className="text-3xl font-black mb-8 italic tracking-tighter text-white">ODA OLUŞTUR</h3>
               
               <div className="space-y-6">
                 <div>
@@ -302,7 +237,7 @@ export default function LobbyPage() {
                     type="text"
                     value={newRoomName}
                     onChange={(e) => setNewRoomName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/5 rounded-[1.5rem] py-4 px-6 focus:border-indigo-500/50 outline-none transition-all text-sm"
+                    className="w-full bg-white/5 border border-white/5 rounded-[1.5rem] py-4 px-6 focus:border-indigo-500/50 outline-none transition-all text-sm text-white"
                     placeholder="Efsanevi bir isim seç..."
                   />
                 </div>
@@ -320,10 +255,6 @@ export default function LobbyPage() {
                     onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
                     className="w-full accent-indigo-500 bg-white/5 rounded-full h-2 appearance-none cursor-pointer"
                   />
-                  <div className="flex justify-between text-[9px] font-black text-zinc-700 mt-3 tracking-widest uppercase">
-                    <span>2 Solo</span>
-                    <span>4 Takım</span>
-                  </div>
                 </div>
 
                 <div className="pt-6 flex gap-4">

@@ -1,109 +1,73 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { User, Session } from '@supabase/supabase-js';
+import { api, socket } from '../lib/api';
 
-interface Profile {
+interface User {
   id: string;
   username: string;
-  avatar_url: string;
-  is_online: boolean;
+  avatar_id: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
-  profile: Profile | null;
   loading: boolean;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  signOut: () => void;
+  signIn: (data: any) => Promise<void>;
+  signUp: (data: any) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (uid: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', uid)
-      .single();
-    
-    if (!error && data) {
-      setProfile(data);
-    }
-  };
-
   useEffect(() => {
-    // Güvenlik zaman aşımı: 10 saniye içinde yanıt gelmezse yükleme ekranını kapat
-    const safetyTimeout = setTimeout(() => {
-      setLoading(prev => {
-        if (prev) {
-          console.warn('Kimlik doğrulama zaman aşımına uğradı, uygulama başlatılıyor...');
-          return false;
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const userData = await api.get('/api/me');
+          setUser(userData);
+          socket.connect();
+          socket.emit('auth', token);
+        } catch (err) {
+          console.error("Auth init error:", err);
+          localStorage.removeItem('token');
         }
-        return prev;
-      });
-    }, 10000);
-
-    try {
-      // İlk oturumu al
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          fetchProfile(session.user.id).finally(() => {
-            setLoading(false);
-            clearTimeout(safetyTimeout);
-          });
-        } else {
-          setLoading(false);
-          clearTimeout(safetyTimeout);
-        }
-      }).catch(err => {
-        console.error('Oturum getirme hatası:', err);
-        setLoading(false);
-        clearTimeout(safetyTimeout);
-      });
-
-      // Değişiklikleri dinle
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-        setLoading(false);
-        clearTimeout(safetyTimeout);
-      });
-
-      return () => {
-        subscription?.unsubscribe();
-        clearTimeout(safetyTimeout);
-      };
-    } catch (err) {
-      console.error('Kimlik doğrulama başlatma hatası:', err);
+      }
       setLoading(false);
-      clearTimeout(safetyTimeout);
-    }
+    };
+    initAuth();
+
+    // Güvenlik amaçlı: 5 saniye sonra yükleme ekranını her türlü kapat
+    const timer = setTimeout(() => setLoading(false), 5000);
+    return () => clearTimeout(timer);
   }, []);
 
-  const refreshProfile = async () => {
-    if (user) await fetchProfile(user.id);
+  const signIn = async (credentials: any) => {
+    const { token, user: userData } = await api.post('/api/auth/signin', credentials);
+    localStorage.setItem('token', token);
+    setUser(userData);
+    socket.connect();
+    socket.emit('auth', token);
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const signUp = async (credentials: any) => {
+    const { token, user: userData } = await api.post('/api/auth/signup', credentials);
+    localStorage.setItem('token', token);
+    setUser(userData);
+    socket.connect();
+    socket.emit('auth', token);
+  };
+
+  const signOut = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    socket.disconnect();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, loading, signOut, signIn, signUp }}>
       {children}
     </AuthContext.Provider>
   );
