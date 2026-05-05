@@ -1,0 +1,6 @@
+{
+  "name": "Oyunmatik",
+  "description": "A production-ready real-time game lobby system with room management, live chat, and presence tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
