@@ -21,30 +21,67 @@ export const supabase = new Proxy({} as SupabaseClient, {
     }
 
     if (!supabaseInstance) {
-      // Return a safe-ish mock to prevent total crash on startup
-      return {
-        auth: {
-          getSession: async () => ({ data: { session: null }, error: null }),
-          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-          signOut: async () => {}
+      const createSafeProxy = (target: any): any => {
+        return new Proxy(target, {
+          get(t, p) {
+            if (p === 'then') return undefined; // Prevent it from looking like a promise if it's not
+            if (typeof t[p] === 'function') return t[p];
+            if (t[p] !== undefined) return t[p];
+            // If it's a known fluent method or just any missing prop, return a function that returns a proxy
+            return (...args: any[]) => createSafeProxy(t);
+          }
+        });
+      };
+
+      const mockAuth = {
+        getSession: async () => ({ data: { session: null }, error: null }),
+        onAuthStateChange: (cb: any) => {
+          // Trigger the callback with null session immediately to clear loading states
+          setTimeout(() => cb('SIGNED_OUT', null), 0);
+          return { data: { subscription: { unsubscribe: () => {} } } };
         },
-        from: () => ({
-          select: () => ({
-             eq: () => ({ single: async () => ({ data: null, error: { message: 'Supabase unconfigured' } }), order: () => ({ data: [], error: null }) }),
-             order: () => ({ data: [], error: null }),
-             limit: () => ({ data: [], error: null })
-          }),
-          insert: () => ({ select: () => ({ single: async () => ({ data: null, error: { message: 'Supabase unconfigured' } }) }) }),
-          delete: () => ({ eq: () => ({ eq: async () => ({ error: null }) }) }),
-          upsert: async () => ({ error: null })
-        }),
-        channel: () => ({
-          on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
-          subscribe: () => ({ unsubscribe: () => {} }),
-          track: async () => {},
-          presenceState: () => ({})
-        })
-      }[prop as string] || (() => ({}));
+        signOut: async () => ({ error: null }),
+        signUp: async () => ({ data: { user: null }, error: { message: 'Supabase unconfigured' } }),
+        signInWithPassword: async () => ({ data: { user: null }, error: { message: 'Supabase unconfigured' } }),
+      };
+
+      const mockFrom = () => {
+        const handler = {
+          select: () => createSafeProxy(handler),
+          insert: () => createSafeProxy(handler),
+          update: () => createSafeProxy(handler),
+          upsert: () => createSafeProxy(handler),
+          delete: () => createSafeProxy(handler),
+          eq: () => createSafeProxy(handler),
+          neq: () => createSafeProxy(handler),
+          gt: () => createSafeProxy(handler),
+          lt: () => createSafeProxy(handler),
+          order: () => createSafeProxy(handler),
+          limit: () => createSafeProxy(handler),
+          single: async () => ({ data: null, error: { message: 'Supabase unconfigured' } }),
+          maybeSingle: async () => ({ data: null, error: { message: 'Supabase unconfigured' } }),
+          then: (onFullfilled: any) => Promise.resolve({ data: [], error: null }).then(onFullfilled)
+        };
+        return createSafeProxy(handler);
+      };
+
+      const mockChannel = () => createSafeProxy({
+        on: () => mockChannel(),
+        subscribe: (cb: any) => { if (cb) setTimeout(() => cb('SUBSCRIBED'), 0); return mockChannel(); },
+        unsubscribe: () => {},
+        track: async () => {},
+        send: async () => {},
+        presenceState: () => ({})
+      });
+
+      const mocks: Record<string, any> = {
+        auth: mockAuth,
+        from: mockFrom,
+        channel: mockChannel,
+        rpc: async () => ({ data: null, error: null }),
+      };
+
+      return mocks[prop as string] || (() => createSafeProxy({}));
     }
 
     return (supabaseInstance as any)[prop];
