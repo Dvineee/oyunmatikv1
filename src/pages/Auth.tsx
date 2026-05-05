@@ -90,17 +90,17 @@ export default function AuthPage() {
           <div className="flex-1 bg-[#34C759]" />
         </div>
         
-        <div className="flex flex-col items-center mb-14">
+        <div className="flex flex-col items-center mb-10 sm:mb-14">
           <motion.div 
             whileHover={{ rotate: [0, -10, 10, 0], scale: 1.15 }}
-            className="p-8 bg-white/5 rounded-[2.5rem] mb-8 shadow-2xl relative group cursor-pointer border border-white/10"
+            className="p-6 sm:p-8 bg-white/5 rounded-[2rem] sm:rounded-[2.5rem] mb-6 sm:mb-8 shadow-2xl relative group cursor-pointer border border-white/10"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#FF2D55] to-[#5856D6] rounded-[2.5rem] opacity-20 group-hover:opacity-40 transition-opacity" />
-            <Gamepad2 className="w-16 h-16 text-white relative z-10" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF2D55] to-[#5856D6] rounded-[2rem] sm:rounded-[2.5rem] opacity-20 group-hover:opacity-40 transition-opacity" />
+            <Gamepad2 className="w-12 h-12 sm:w-16 sm:h-16 text-white relative z-10" />
           </motion.div>
 
           <div className="text-center">
-            <h1 className="text-6xl font-black italic tracking-tighter text-white mb-4 flex justify-center gap-1.5">
+            <h1 className="text-4xl sm:text-6xl font-black italic tracking-tighter text-white mb-3 sm:mb-4 flex justify-center gap-1 sm:gap-1.5">
               {Array.from("OYUNMATİK").map((l, i) => (
                 <motion.span 
                   key={i}
@@ -117,26 +117,26 @@ export default function AuthPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.8 }}
-              className="flex items-center gap-3 bg-indigo-500/10 px-5 py-2.5 rounded-full border border-indigo-500/20 mx-auto w-fit"
+              className="flex items-center gap-2 sm:gap-3 bg-indigo-500/10 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border border-indigo-500/20 mx-auto w-fit"
             >
-              <Sparkles className="w-4 h-4 text-indigo-400 animate-pulse" />
-              <span className="text-indigo-400 font-black text-[11px] uppercase tracking-[0.5em]">Geleceğin Oyun Arenası</span>
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 h-4 text-indigo-400 animate-pulse" />
+              <span className="text-indigo-400 font-black text-[9px] sm:text-[11px] uppercase tracking-[0.3em] sm:tracking-[0.5em]">Geleceğin Oyun Arenası</span>
             </motion.div>
           </div>
         </div>
 
-        <form onSubmit={handleAuth} className="space-y-10">
-          <div className="space-y-8">
+        <form onSubmit={handleAuth} className="space-y-8 sm:y-10">
+          <div className="space-y-6 sm:space-y-8">
             <div className="relative group">
-              <label className="block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-4 ml-3">OYUNCU KİMLİĞİ</label>
+              <label className="block text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-3 sm:mb-4 ml-2 sm:ml-3">OYUNCU KİMLİĞİ</label>
               <div className="relative">
-                <User className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 group-focus-within:text-white transition-colors z-10" />
+                <User className="absolute left-6 sm:left-7 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-zinc-600 group-focus-within:text-white transition-colors z-10" />
                 <input
                   type="text"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-white/[0.03] border-2 border-white/5 rounded-[2rem] py-6 pl-16 pr-8 focus:bg-white/5 focus:border-[#5856D6]/40 outline-none transition-all placeholder:text-zinc-700 text-lg font-bold text-white shadow-inner"
+                  className="w-full bg-white/[0.03] border-2 border-white/5 rounded-[1.5rem] sm:rounded-[2rem] py-5 sm:py-6 pl-14 sm:pl-16 pr-6 sm:pr-8 focus:bg-white/5 focus:border-[#5856D6]/40 outline-none transition-all placeholder:text-zinc-700 text-base sm:text-lg font-bold text-white shadow-inner"
                   placeholder="Kullanıcı adını seç..."
                 />
               </div>
@@ -148,21 +148,21 @@ export default function AuthPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 className="space-y-4"
               >
-                <label className="block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-4 ml-3">KARAKTERİNİ BELİRLE</label>
+                <label className="block text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-3 sm:mb-4 ml-2 sm:ml-3">KARAKTERİNİ BELİRLE</label>
                 <AvatarPicker selectedId={avatarUrl} onSelect={setAvatarUrl} />
               </motion.div>
             )}
 
             <div className="relative group">
-              <label className="block text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-4 ml-3">GÜVENLİK KODU</label>
+              <label className="block text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-zinc-500 mb-3 sm:mb-4 ml-2 sm:ml-3">GÜVENLİK KODU</label>
               <div className="relative">
-                <Lock className="absolute left-7 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 group-focus-within:text-white transition-colors z-10" />
+                <Lock className="absolute left-6 sm:left-7 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-zinc-600 group-focus-within:text-white transition-colors z-10" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/[0.03] border-2 border-white/5 rounded-[2rem] py-6 pl-16 pr-8 focus:bg-white/5 focus:border-[#5856D6]/40 outline-none transition-all placeholder:text-zinc-700 text-lg font-bold text-white shadow-inner"
+                  className="w-full bg-white/[0.03] border-2 border-white/5 rounded-[1.5rem] sm:rounded-[2rem] py-5 sm:py-6 pl-14 sm:pl-16 pr-6 sm:pr-8 focus:bg-white/5 focus:border-[#5856D6]/40 outline-none transition-all placeholder:text-zinc-700 text-base sm:text-lg font-bold text-white shadow-inner"
                   placeholder="••••••••"
                 />
               </div>
@@ -175,9 +175,9 @@ export default function AuthPage() {
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 10 }}
-                className="p-6 bg-red-500/10 border-2 border-red-500/20 rounded-[2rem] text-red-400 text-xs font-black text-center uppercase tracking-widest flex items-center justify-center gap-3"
+                className="p-5 sm:p-6 bg-red-500/10 border-2 border-red-500/20 rounded-[1.5rem] sm:rounded-[2rem] text-red-400 text-[10px] sm:text-xs font-black text-center uppercase tracking-widest flex items-center justify-center gap-2 sm:gap-3"
               >
-                <span className="text-xl">⚠️</span> {error}
+                <span className="text-lg sm:text-xl">⚠️</span> {error}
               </motion.div>
             )}
           </AnimatePresence>
@@ -187,15 +187,15 @@ export default function AuthPage() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={loading}
-            className="w-full bg-white text-black font-black py-6 rounded-[2.5rem] transition-all duration-300 flex items-center justify-center gap-4 disabled:opacity-50 shadow-[0_20px_40px_rgba(255,255,255,0.1)] relative overflow-hidden group"
+            className="w-full bg-white text-black font-black py-5 sm:py-6 rounded-[2rem] sm:rounded-[2.5rem] transition-all duration-300 flex items-center justify-center gap-3 sm:gap-4 disabled:opacity-50 shadow-[0_20px_40px_rgba(255,255,255,0.1)] relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             {loading ? (
-              <Loader2 className="w-7 h-7 animate-spin" />
+              <Loader2 className="w-6 h-6 sm:w-7 sm:h-7 animate-spin" />
             ) : (
               <>
-                <span className="tracking-[0.4em] uppercase text-sm">{isLogin ? 'ARENAYA GİRİŞ YAP' : 'SAVAŞA ÜYE OL'}</span>
-                <Gamepad2 className="w-7 h-7 group-hover:rotate-12 transition-all" />
+                <span className="tracking-[0.3em] sm:tracking-[0.4em] uppercase text-xs sm:text-sm">{isLogin ? 'ARENAYA GİRİŞ YAP' : 'SAVAŞA ÜYE OL'}</span>
+                <Gamepad2 className="w-6 h-6 sm:w-7 sm:h-7 group-hover:rotate-12 transition-all" />
               </>
             )}
           </motion.button>

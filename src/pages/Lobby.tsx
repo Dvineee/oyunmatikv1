@@ -92,29 +92,29 @@ export default function LobbyPage() {
         <div className="absolute bottom-0 left-0 w-[60%] h-[60%] bg-[#5856D6]/20 blur-[150px] rounded-full" />
       </div>
 
-      <header className="sticky top-0 z-40 bg-[#080808]/60 backdrop-blur-3xl border-b-2 border-white/5 px-8 pt-6 pb-0">
-        <div className="max-w-7xl mx-auto flex items-center justify-between pb-6">
-          <div className="flex items-center gap-5">
+      <header className="sticky top-0 z-40 bg-[#080808]/80 backdrop-blur-3xl border-b border-white/10 px-4 sm:px-8 pt-4 sm:pt-6 pb-0 shadow-2xl">
+        <div className="max-w-7xl mx-auto flex items-center justify-between pb-4 sm:pb-6">
+          <div className="flex items-center gap-3 sm:gap-5">
             <motion.div 
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              className="p-3 bg-gradient-to-br from-[#FF2D55] to-[#FF9500] rounded-2xl shadow-lg shadow-pink-500/20"
+              className="p-2 sm:p-3 bg-gradient-to-br from-[#FF2D55] to-[#FF9500] rounded-xl sm:rounded-2xl shadow-lg shadow-pink-500/20"
             >
-              <Radio className="w-6 h-6 text-white" />
+              <Radio className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </motion.div>
             <div>
-              <h1 className="text-3xl font-black italic tracking-tighter text-white">OYUNMATİK</h1>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Sistem Aktif</span>
+              <h1 className="text-xl sm:text-3xl font-black italic tracking-tighter text-white">OYUNMATİK</h1>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-emerald-500/80">Sistem Aktif</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-3 sm:gap-8">
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="flex items-center gap-5 bg-white/5 pl-6 pr-2 py-2 rounded-[2rem] border border-white/10"
+              className="flex items-center gap-2 sm:gap-5 bg-white/5 pl-3 sm:pl-6 pr-1 sm:pr-2 py-1 sm:py-2 rounded-xl sm:rounded-[2rem] border border-white/10"
             >
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-black text-white leading-none uppercase tracking-wide">{user?.username}</p>
@@ -123,17 +123,17 @@ export default function LobbyPage() {
                   <p className="text-[9px] font-black text-[#FF9500] uppercase tracking-[0.3em]">PROFESYONEL</p>
                 </div>
               </div>
-              <AvatarDisplay avatarId={user?.avatar_id || 'animal_1'} size="sm" animate />
+              <AvatarDisplay avatarId={user?.avatar_id || 'animal_1'} size="sm" animate ring />
             </motion.div>
             
             <motion.button 
               whileHover={{ scale: 1.1, rotate: 10 }}
               whileTap={{ scale: 0.9 }}
               onClick={signOut}
-              className="p-4 bg-red-500/10 hover:bg-red-500/20 rounded-2xl transition-all text-red-500 border border-red-500/20 shadow-lg shadow-red-500/10"
+              className="p-3 sm:p-4 bg-white/5 hover:bg-red-500/20 rounded-xl sm:rounded-2xl transition-all text-zinc-400 hover:text-red-500 border border-white/10"
               title="Güvenli Çıkış"
             >
-              <LogOut className="w-5 h-5" />
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </motion.button>
           </div>
         </div>
@@ -155,33 +155,33 @@ export default function LobbyPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-4 gap-12 relative z-10">
-        <div className="lg:col-span-3 space-y-12">
-          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
-            <div>
-              <h2 className="text-5xl font-black text-white tracking-tighter italic">ARENA LOBİSİ</h2>
-              <div className="flex items-center gap-3 mt-3">
-                <div className="h-1 w-12 bg-[#FF2D55] rounded-full" />
-                <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">Arenada su an {rooms.length} oda açık</p>
+      <main className="max-w-7xl mx-auto p-4 sm:p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-4 gap-8 lg:gap-12 relative z-10">
+        <div className="lg:col-span-3 space-y-8 sm:space-y-12">
+          <div className="flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6 bg-white/[0.02] p-6 sm:p-0 rounded-[2rem] sm:bg-transparent border sm:border-0 border-white/5">
+            <div className="text-center sm:text-left">
+              <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tighter italic">ARENA LOBİSİ</h2>
+              <div className="flex items-center justify-center sm:justify-start gap-3 mt-3">
+                <div className="h-1 w-8 sm:w-12 bg-[#FF2D55] rounded-full" />
+                <p className="text-zinc-500 text-xs sm:text-sm font-bold uppercase tracking-widest">{rooms.length} oda açık</p>
               </div>
             </div>
             <motion.button
               whileHover={{ scale: 1.05, y: -4 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setShowCreateModal(true)}
-              className="w-full md:w-auto bg-gradient-to-r from-[#5856D6] to-[#af52de] text-white font-black px-10 py-5 rounded-[2rem] flex items-center justify-center gap-4 transition-all shadow-2xl shadow-indigo-500/40 relative overflow-hidden group"
+              className="w-full sm:w-auto bg-gradient-to-r from-[#5856D6] to-[#af52de] text-white font-black px-8 sm:px-10 py-4 sm:py-5 rounded-2xl sm:rounded-[2rem] flex items-center justify-center gap-4 transition-all shadow-xl shadow-indigo-500/20 relative overflow-hidden group"
             >
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
-              <span className="tracking-[0.2em]">YENİ ODA KUR</span>
+              <Plus className="w-5 h-5 sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform" />
+              <span className="tracking-[0.2em] text-sm">YENİ ODA KUR</span>
             </motion.button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <AnimatePresence mode="popLayout">
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-60 bg-white/5 animate-pulse rounded-[3rem] border-2 border-white/5" />
+                  <div key={i} className="h-52 sm:h-64 bg-white/5 animate-pulse rounded-[2.5rem] sm:rounded-[3.5rem] border border-white/5" />
                 ))
               ) : rooms.length > 0 ? (
                 rooms.map((room) => (
@@ -190,32 +190,32 @@ export default function LobbyPage() {
                     layout
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ y: -10 }}
-                    className="bg-zinc-900/40 backdrop-blur-2xl p-8 flex flex-col justify-between h-64 border-2 border-white/5 hover:border-[#5856D6]/50 transition-all rounded-[3.5rem] group relative overflow-hidden shadow-2xl"
+                    whileHover={{ y: -8 }}
+                    className="bg-zinc-900/40 backdrop-blur-2xl p-6 sm:p-8 flex flex-col justify-between h-56 sm:h-64 border border-white/5 hover:border-[#5856D6]/50 transition-all rounded-[2.5rem] sm:rounded-[3.5rem] group relative overflow-hidden shadow-2xl"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#5856D6]/5 blur-3xl group-hover:bg-[#5856D6]/20 transition-colors" />
                     
                     <div>
-                      <div className="flex justify-between items-start mb-6">
+                      <div className="flex justify-between items-start mb-4 sm:mb-6">
                         <span className={cn(
-                          "text-[10px] font-black py-2 px-4 rounded-full uppercase tracking-[0.2em] shadow-lg",
+                          "text-[9px] sm:text-[10px] font-black py-1.5 sm:py-2 px-3 sm:px-4 rounded-full uppercase tracking-[0.2em] shadow-lg",
                           room.status === 'waiting' 
                             ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
                             : "bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20"
                         )}>
                           {room.status === 'waiting' ? '• BEKLİYOR' : '• OYUNDA'}
                         </span>
-                        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/5">
-                          <Users className="w-4 h-4 text-zinc-400" />
-                          <span className="text-white font-black text-xs">{room.player_count}/{room.max_players}</span>
+                        <div className="flex items-center gap-2 sm:gap-3 bg-white/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-white/5">
+                          <Users className="w-3 h-3 sm:w-4 sm:h-4 text-zinc-400" />
+                          <span className="text-white font-black text-[10px] sm:text-xs">{room.player_count}/{room.max_players}</span>
                         </div>
                       </div>
-                      <h3 className="text-2xl font-black text-white group-hover:text-[#5856D6] transition-colors truncate italic tracking-tight">{room.name}</h3>
-                      <div className="flex items-center gap-3 mt-4 bg-white/5 w-fit px-4 py-2 rounded-2xl border border-white/5">
-                        <AvatarDisplay avatarId={room.host_avatar || 'animal_1'} size="xs" />
+                      <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#5856D6] transition-colors truncate italic tracking-tight">{room.name}</h3>
+                      <div className="flex items-center gap-3 mt-3 sm:mt-4 bg-white/5 w-fit px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border border-white/5">
+                        <AvatarDisplay avatarId={room.host_avatar || 'animal_1'} size="xs" ring />
                         <div className="leading-none">
-                          <p className="text-[10px] text-zinc-600 font-black uppercase tracking-tighter">LİDER</p>
-                          <p className="text-sm font-black text-zinc-200 mt-0.5">{room.host_name}</p>
+                          <p className="text-[8px] sm:text-[10px] text-zinc-600 font-black uppercase tracking-tighter">LİDER</p>
+                          <p className="text-xs sm:text-sm font-black text-zinc-200 mt-0.5">{room.host_name}</p>
                         </div>
                       </div>
                     </div>
@@ -224,23 +224,23 @@ export default function LobbyPage() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => joinRoom(room.id)}
                       disabled={room.player_count === room.max_players && room.status === 'waiting'}
-                      className="w-full bg-white/5 hover:bg-[#5856D6] text-white font-black py-5 rounded-[1.75rem] flex items-center justify-center gap-3 transition-all border border-white/10 shadow-lg group-hover:shadow-indigo-500/20"
+                      className="w-full bg-white/5 hover:bg-[#5856D6] text-white font-black py-4 sm:py-5 rounded-[1.25rem] sm:rounded-[1.75rem] flex items-center justify-center gap-3 transition-all border border-white/10 shadow-lg group-hover:shadow-indigo-500/20"
                     >
-                      <DoorOpen className="w-5 h-5 opacity-50 group-hover:translate-x-1 transition-transform" />
-                      <span className="tracking-widest">KATIL</span>
+                      <DoorOpen className="w-4 h-4 sm:w-5 sm:h-5 opacity-50 group-hover:translate-x-1 transition-transform" />
+                      <span className="tracking-widest text-xs sm:text-sm">KATIL</span>
                     </motion.button>
                   </motion.div>
                 ))
               ) : (
-                <div className="col-span-full py-32 text-center border-4 border-dashed border-white/5 rounded-[4rem] bg-white/[0.02]">
+                <div className="col-span-full py-20 sm:py-32 text-center border-4 border-dashed border-white/5 rounded-[3rem] sm:rounded-[4rem] bg-white/[0.02]">
                    <motion.div 
                      animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
                      transition={{ repeat: Infinity, duration: 4 }}
-                     className="w-24 h-24 bg-white/5 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl border border-white/10"
+                     className="w-20 h-20 sm:w-24 sm:h-24 bg-white/5 rounded-[2rem] sm:rounded-[2.5rem] flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-2xl border border-white/10"
                    >
-                     <Gamepad2 className="w-12 h-12 text-zinc-100 opacity-20" />
+                     <Gamepad2 className="w-10 h-10 sm:w-12 sm:h-12 text-zinc-100 opacity-20" />
                    </motion.div>
-                   <p className="text-zinc-500 font-black text-sm uppercase tracking-[0.4em] px-4 leading-relaxed">Şu an arenada kimse yok... <br/>İlk savaşı sen başlat!</p>
+                   <p className="text-zinc-500 font-black text-xs sm:text-sm uppercase tracking-[0.3em] sm:tracking-[0.4em] px-4 leading-relaxed">Şu an arenada kimse yok... <br/>İlk savaşı sen başlat!</p>
                 </div>
               )}
             </AnimatePresence>
@@ -248,41 +248,41 @@ export default function LobbyPage() {
         </div>
 
         <div className="space-y-8">
-          <div className="bg-zinc-900/60 backdrop-blur-3xl border-2 border-white/5 rounded-[3.5rem] p-10 h-fit sticky top-36 shadow-2xl overflow-hidden group">
+          <div className="bg-zinc-900/60 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] sm:rounded-[3.5rem] p-6 sm:p-10 h-fit lg:sticky lg:top-36 shadow-2xl overflow-hidden group">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-[#5856D6]" />
             
-            <div className="flex items-center justify-between mb-10">
-              <h3 className="font-black text-xs uppercase tracking-[0.3em] text-zinc-500">CANLI OYUNCULAR</h3>
-              <div className="flex items-center gap-2.5 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
-                <span className="text-emerald-500 text-[11px] font-black uppercase tracking-tighter">
+            <div className="flex items-center justify-between mb-8 sm:mb-10">
+              <h3 className="font-black text-[10px] sm:text-xs uppercase tracking-[0.3em] text-zinc-500">CANLI OYUNCULAR</h3>
+              <div className="flex items-center gap-2 sm:gap-2.5 bg-emerald-500/10 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-emerald-500/20">
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-emerald-500 rounded-full animate-ping" />
+                <span className="text-emerald-500 text-[9px] sm:text-[11px] font-black uppercase tracking-tighter">
                   {onlineUsers.length} ONLINE
                 </span>
               </div>
             </div>
             
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {onlineUsers.map((u: any, i) => (
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.1 }}
                   key={u.id || i} 
-                  className="flex items-center gap-5 group"
+                  className="flex items-center gap-4 sm:gap-5 group"
                 >
                   <div className="relative">
-                    <AvatarDisplay avatarId={u.avatar_id} size="sm" animate />
+                    <AvatarDisplay avatarId={u.avatar_id} size="sm" animate ring />
                     <motion.div 
                       animate={{ scale: [1, 1.3, 1] }}
                       transition={{ repeat: Infinity, duration: 2 }}
-                      className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-[#121212] shadow-xl" 
+                      className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 bg-emerald-500 rounded-full border-2 sm:border-4 border-[#121212] shadow-xl" 
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-base font-black text-zinc-100 truncate group-hover:text-[#5856D6] transition-colors leading-none">{u.username}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                       <span className="w-1.5 h-1.5 bg-[#FF9500] rounded-full" />
-                       <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Savaşa Hazır</p>
+                    <p className="text-sm sm:text-base font-black text-zinc-100 truncate group-hover:text-[#5856D6] transition-colors leading-none">{u.username}</p>
+                    <div className="flex items-center gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+                       <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-[#FF9500] rounded-full" />
+                       <p className="text-[8px] sm:text-[10px] font-black text-zinc-600 uppercase tracking-widest">Hazır</p>
                     </div>
                   </div>
                 </motion.div>
