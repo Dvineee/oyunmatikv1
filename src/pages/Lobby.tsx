@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, Search, DoorOpen, LogOut, Radio, Loader2 } from 'lucide-react';
+import { Plus, Users, Search, DoorOpen, LogOut, Radio, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AvatarDisplay } from '../components/AvatarPicker';
 import { playSound } from '../lib/sounds';

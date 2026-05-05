@@ -4,7 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import AuthPage from './pages/Auth';
 import LobbyPage from './pages/Lobby';
 import RoomPage from './pages/Room';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Gamepad2 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

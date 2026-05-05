@@ -11,55 +11,58 @@ function cn(...inputs: ClassValue[]) {
 export function AvatarPicker({ selectedId, onSelect }: AvatarPickerProps) {
   return (
     <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-4 p-3 sm:p-6 bg-white/5 rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 shadow-inner">
-      {AVATARS.map((avatar) => (
-        <button
-          key={avatar.id}
-          type="button"
-          onClick={() => onSelect(avatar.id)}
-          className={cn(
-            "relative group flex flex-col items-center justify-center p-2 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-300 border-[3px]",
-            selectedId === avatar.id 
-              ? "border-indigo-500 bg-indigo-500/20 scale-110 sm:scale-105 z-10" 
-              : "border-transparent bg-white/5 hover:bg-white/10 hover:scale-105"
-          )}
-        >
-          <motion.div 
-            animate={selectedId === avatar.id ? { 
-              y: [0, -4, 0],
-              rotate: [0, -8, 8, 0],
-              scale: [1, 1.15, 1]
-            } : {}}
-            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+      {AVATARS.map((avatar) => {
+        const Icon = avatar.icon;
+        return (
+          <button
+            key={avatar.id}
+            type="button"
+            onClick={() => onSelect(avatar.id)}
             className={cn(
-              "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.5rem] mb-2 sm:mb-3 flex items-center justify-center shadow-2xl relative overflow-hidden transition-transform", 
-              avatar.color
+              "relative group flex flex-col items-center justify-center p-2 sm:p-4 rounded-[1.5rem] sm:rounded-[2rem] transition-all duration-300 border-[3px]",
+              selectedId === avatar.id 
+                ? "border-indigo-500 bg-indigo-500/20 scale-110 sm:scale-105 z-10" 
+                : "border-transparent bg-white/5 hover:bg-white/10 hover:scale-105"
             )}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
-            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '10px 10px' }} />
-            
-            <avatar.icon className="w-6 h-6 sm:w-9 sm:h-9 text-white filter drop-shadow-lg z-10" strokeWidth={3} />
-          </motion.div>
-          <span className={cn(
-            "text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-black transition-colors hidden sm:block",
-            selectedId === avatar.id ? "text-indigo-400" : "text-zinc-500"
-          )}>
-            {avatar.name}
-          </span>
-          {selectedId === avatar.id && (
             <motion.div 
-              layoutId="activeAvatar"
-              className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-8 sm:h-8 bg-indigo-500 rounded-full border-[2px] sm:border-[4px] border-[#080808] flex items-center justify-center shadow-xl z-20"
+              animate={selectedId === avatar.id ? { 
+                y: [0, -4, 0],
+                rotate: [0, -8, 8, 0],
+                scale: [1, 1.15, 1]
+              } : {}}
+              transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+              className={cn(
+                "w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-[1.5rem] mb-2 sm:mb-3 flex items-center justify-center shadow-2xl relative overflow-hidden transition-transform", 
+                avatar.color
+              )}
             >
-               <motion.div 
-                animate={{ scale: [1, 1.3, 1] }} 
-                transition={{ repeat: Infinity, duration: 1.5 }}
-                className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 bg-white rounded-full" 
-               />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+              <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '10px 10px' }} />
+              
+              <Icon className="w-6 h-6 sm:w-9 sm:h-9 text-white filter drop-shadow-lg z-10" strokeWidth={3} />
             </motion.div>
-          )}
-        </button>
-      ))}
+            <span className={cn(
+              "text-[8px] sm:text-[10px] uppercase tracking-[0.2em] font-black transition-colors hidden sm:block",
+              selectedId === avatar.id ? "text-indigo-400" : "text-zinc-500"
+            )}>
+              {avatar.name}
+            </span>
+            {selectedId === avatar.id && (
+              <motion.div 
+                layoutId="activeAvatar"
+                className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 w-5 h-5 sm:w-8 sm:h-8 bg-indigo-500 rounded-full border-[2px] sm:border-[4px] border-[#080808] flex items-center justify-center shadow-xl z-20"
+              >
+                <motion.div 
+                  animate={{ scale: [1, 1.3, 1] }} 
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="w-1.5 h-1.5 sm:w-2.5 sm:h-2.5 bg-white rounded-full" 
+                />
+              </motion.div>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -87,6 +90,8 @@ export function AvatarDisplay({ avatarId, size = "md", animate = false, ring = f
     md: "rounded-2xl sm:rounded-[2.5rem]",
     lg: "rounded-3xl sm:rounded-[4rem]"
   };
+
+  const Icon = avatar.icon;
 
   return (
     <div className={cn("relative isolate", sizeClasses[size])}>
@@ -127,7 +132,7 @@ export function AvatarDisplay({ avatarId, size = "md", animate = false, ring = f
           } : {}}
           transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
         >
-          <avatar.icon className={cn("text-white filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] z-10", iconClasses[size])} strokeWidth={2.5} />
+          <Icon className={cn("text-white filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] z-10", iconClasses[size])} strokeWidth={2.5} />
         </motion.div>
         
         {/* Shine effect */}

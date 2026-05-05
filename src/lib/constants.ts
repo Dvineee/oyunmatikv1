@@ -7,6 +7,11 @@ import {
   Turtle 
 } from 'lucide-react';
 
+export interface AvatarPickerProps {
+  selectedId: string;
+  onSelect: (id: string) => void;
+}
+
 export const AVATARS = [
   { id: 'animal_1', name: 'Tavşan', color: 'bg-[#5856D6]', icon: Rabbit, accent: '#8E8E93' },
   { id: 'animal_2', name: 'Kedi', color: 'bg-[#FF9500]', icon: Cat, accent: '#FFCC00' },
