@@ -85,99 +85,162 @@ export default function LobbyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-zinc-100 font-sans pb-20">
-      <header className="sticky top-0 z-30 bg-[#050505]/80 backdrop-blur-3xl border-b border-white/5 px-8 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="p-2 bg-indigo-500/10 rounded-xl">
-            <Radio className="w-5 h-5 text-indigo-400 animate-pulse" />
+    <div className="min-h-screen bg-[#080808] text-zinc-100 font-sans pb-20 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="fixed inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-0 right-0 w-[60%] h-[60%] bg-[#FF2D55]/20 blur-[150px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[60%] h-[60%] bg-[#5856D6]/20 blur-[150px] rounded-full" />
+      </div>
+
+      <header className="sticky top-0 z-40 bg-[#080808]/60 backdrop-blur-3xl border-b-2 border-white/5 px-8 pt-6 pb-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between pb-6">
+          <div className="flex items-center gap-5">
+            <motion.div 
+              animate={{ rotate: [0, 360] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              className="p-3 bg-gradient-to-br from-[#FF2D55] to-[#FF9500] rounded-2xl shadow-lg shadow-pink-500/20"
+            >
+              <Radio className="w-6 h-6 text-white" />
+            </motion.div>
+            <div>
+              <h1 className="text-3xl font-black italic tracking-tighter text-white">OYUNMATİK</h1>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Sistem Aktif</span>
+              </div>
+            </div>
           </div>
-          <h1 className="text-xl font-black italic tracking-tighter shadow-indigo-500/50">OYUNMATİK</h1>
+
+          <div className="flex items-center gap-8">
+            <motion.div 
+              whileHover={{ scale: 1.05 }}
+              className="flex items-center gap-5 bg-white/5 pl-6 pr-2 py-2 rounded-[2rem] border border-white/10"
+            >
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-black text-white leading-none uppercase tracking-wide">{user?.username}</p>
+                <div className="flex items-center gap-2 mt-1.5 justify-end">
+                  <Sparkles className="w-3 h-3 text-[#FF9500]" />
+                  <p className="text-[9px] font-black text-[#FF9500] uppercase tracking-[0.3em]">PROFESYONEL</p>
+                </div>
+              </div>
+              <AvatarDisplay avatarId={user?.avatar_id || 'animal_1'} size="sm" animate />
+            </motion.div>
+            
+            <motion.button 
+              whileHover={{ scale: 1.1, rotate: 10 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={signOut}
+              className="p-4 bg-red-500/10 hover:bg-red-500/20 rounded-2xl transition-all text-red-500 border border-red-500/20 shadow-lg shadow-red-500/10"
+              title="Güvenli Çıkış"
+            >
+              <LogOut className="w-5 h-5" />
+            </motion.button>
+          </div>
         </div>
 
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-4 pr-8 border-r border-white/5">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-white leading-none">{user?.username}</p>
-              <p className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest mt-1.5 font-bold">PROFİLİM</p>
-            </div>
-            <AvatarDisplay avatarId={user?.avatar_id || 'animal_1'} size="sm" />
-          </div>
-          
-          <button 
-            onClick={signOut}
-            className="p-3 bg-white/5 hover:bg-red-500/10 rounded-2xl transition-all text-zinc-400 hover:text-red-400 border border-white/5"
-            title="Çıkış Yap"
+        {/* News Ticker */}
+        <div className="border-t border-white/5 bg-white/[0.02] overflow-hidden py-3">
+          <motion.div 
+            animate={{ x: [0, -1000] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="whitespace-nowrap flex gap-12 text-[9px] font-black uppercase tracking-[0.5em] text-zinc-600"
           >
-            <LogOut className="w-5 h-5" />
-          </button>
+            <span>• ARENA GÜNCELLEMESİ: YENİ KARAKTERLER EKLENDİ</span>
+            <span>• TURNUVA GİRİŞLERİ YAKINDA BAŞLIYOR</span>
+            <span>• EN AKTİF SAVAŞÇI: {onlineUsers[0]?.username || 'YÜKLENİYOR...'}</span>
+            <span>• CANLI ARENA SAYISI: {rooms.length}</span>
+            <span>• KESİNTİSİZ SOHBET KEYFİ AKTİF</span>
+            <span>• ARENA GÜNCELLEMESİ: YENİ KARAKTERLER EKLENDİ</span>
+          </motion.div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-8 grid grid-cols-1 lg:grid-cols-4 gap-12">
-        <div className="lg:col-span-3 space-y-8">
-          <div className="flex items-end justify-between">
+      <main className="max-w-7xl mx-auto p-8 lg:p-12 grid grid-cols-1 lg:grid-cols-4 gap-12 relative z-10">
+        <div className="lg:col-span-3 space-y-12">
+          <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
             <div>
-              <h2 className="text-3xl font-black text-white tracking-tight">Aktif Odalar</h2>
-              <p className="text-zinc-500 text-sm mt-1">Hemen bir savaşa katıl veya kendi odanı kur</p>
+              <h2 className="text-5xl font-black text-white tracking-tighter italic">ARENA LOBİSİ</h2>
+              <div className="flex items-center gap-3 mt-3">
+                <div className="h-1 w-12 bg-[#FF2D55] rounded-full" />
+                <p className="text-zinc-500 text-sm font-bold uppercase tracking-widest">Arenada su an {rooms.length} oda açık</p>
+              </div>
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05, y: -4 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setShowCreateModal(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-2xl flex items-center gap-3 transition-all hover:shadow-xl hover:shadow-indigo-500/20 active:scale-95 group"
+              className="w-full md:w-auto bg-gradient-to-r from-[#5856D6] to-[#af52de] text-white font-black px-10 py-5 rounded-[2rem] flex items-center justify-center gap-4 transition-all shadow-2xl shadow-indigo-500/40 relative overflow-hidden group"
             >
-              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              YENİ ODA KUR
-            </button>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Plus className="w-6 h-6 group-hover:rotate-90 transition-transform" />
+              <span className="tracking-[0.2em]">YENİ ODA KUR</span>
+            </motion.button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <AnimatePresence mode="popLayout">
               {loading ? (
                 Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-44 bg-white/5 animate-pulse rounded-[2rem] border border-white/5" />
+                  <div key={i} className="h-60 bg-white/5 animate-pulse rounded-[3rem] border-2 border-white/5" />
                 ))
               ) : rooms.length > 0 ? (
                 rooms.map((room) => (
                   <motion.div
                     key={room.id}
                     layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    whileHover={{ y: -8 }}
-                    className="glass-card p-6 flex flex-col justify-between h-52 group cursor-default"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ y: -10 }}
+                    className="bg-zinc-900/40 backdrop-blur-2xl p-8 flex flex-col justify-between h-64 border-2 border-white/5 hover:border-[#5856D6]/50 transition-all rounded-[3.5rem] group relative overflow-hidden shadow-2xl"
                   >
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#5856D6]/5 blur-3xl group-hover:bg-[#5856D6]/20 transition-colors" />
+                    
                     <div>
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="text-[9px] font-bold py-1 px-3 bg-white/5 border border-white/5 rounded-full text-zinc-400 uppercase tracking-[0.2em]">
-                          {room.status === 'waiting' ? 'BEKLİYOR' : 'OYUNDA'}
+                      <div className="flex justify-between items-start mb-6">
+                        <span className={cn(
+                          "text-[10px] font-black py-2 px-4 rounded-full uppercase tracking-[0.2em] shadow-lg",
+                          room.status === 'waiting' 
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
+                            : "bg-[#FF9500]/10 text-[#FF9500] border border-[#FF9500]/20"
+                        )}>
+                          {room.status === 'waiting' ? '• BEKLİYOR' : '• OYUNDA'}
                         </span>
-                        <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold font-mono">
-                          <Users className="w-3.5 h-3.5" />
-                          <span>{room.player_count}/{room.max_players}</span>
+                        <div className="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-full border border-white/5">
+                          <Users className="w-4 h-4 text-zinc-400" />
+                          <span className="text-white font-black text-xs">{room.player_count}/{room.max_players}</span>
                         </div>
                       </div>
-                      <h3 className="text-xl font-bold text-white group-hover:text-indigo-400 transition-colors truncate">{room.name}</h3>
-                      <div className="flex items-center gap-2 mt-2">
+                      <h3 className="text-2xl font-black text-white group-hover:text-[#5856D6] transition-colors truncate italic tracking-tight">{room.name}</h3>
+                      <div className="flex items-center gap-3 mt-4 bg-white/5 w-fit px-4 py-2 rounded-2xl border border-white/5">
                         <AvatarDisplay avatarId={room.host_avatar || 'animal_1'} size="xs" />
-                        <p className="text-[11px] text-zinc-500">Kuran: <span className="text-zinc-300 font-bold">{room.host_name}</span></p>
+                        <div className="leading-none">
+                          <p className="text-[10px] text-zinc-600 font-black uppercase tracking-tighter">LİDER</p>
+                          <p className="text-sm font-black text-zinc-200 mt-0.5">{room.host_name}</p>
+                        </div>
                       </div>
                     </div>
                     
-                    <button
+                    <motion.button
+                      whileTap={{ scale: 0.95 }}
                       onClick={() => joinRoom(room.id)}
                       disabled={room.player_count === room.max_players && room.status === 'waiting'}
-                      className="w-full bg-white/5 hover:bg-indigo-600 text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 transition-all border border-white/5 active:scale-95 group-hover:bg-indigo-600/20"
+                      className="w-full bg-white/5 hover:bg-[#5856D6] text-white font-black py-5 rounded-[1.75rem] flex items-center justify-center gap-3 transition-all border border-white/10 shadow-lg group-hover:shadow-indigo-500/20"
                     >
-                      <DoorOpen className="w-4 h-4 opacity-50" />
-                      KATIL
-                    </button>
+                      <DoorOpen className="w-5 h-5 opacity-50 group-hover:translate-x-1 transition-transform" />
+                      <span className="tracking-widest">KATIL</span>
+                    </motion.button>
                   </motion.div>
                 ))
               ) : (
-                <div className="col-span-full py-24 text-center border-2 border-dashed border-white/5 rounded-[3rem] bg-white/[0.01]">
-                   <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                     <Gamepad2 className="w-10 h-10 text-zinc-700" />
-                   </div>
-                   <p className="text-zinc-500 font-bold text-xs uppercase tracking-[0.3em]">Henüz aktif oda bulunmuyor</p>
+                <div className="col-span-full py-32 text-center border-4 border-dashed border-white/5 rounded-[4rem] bg-white/[0.02]">
+                   <motion.div 
+                     animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.1, 1] }}
+                     transition={{ repeat: Infinity, duration: 4 }}
+                     className="w-24 h-24 bg-white/5 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl border border-white/10"
+                   >
+                     <Gamepad2 className="w-12 h-12 text-zinc-100 opacity-20" />
+                   </motion.div>
+                   <p className="text-zinc-500 font-black text-sm uppercase tracking-[0.4em] px-4 leading-relaxed">Şu an arenada kimse yok... <br/>İlk savaşı sen başlat!</p>
                 </div>
               )}
             </AnimatePresence>
@@ -185,32 +248,42 @@ export default function LobbyPage() {
         </div>
 
         <div className="space-y-8">
-          <div className="bg-white/5 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] p-8 h-fit sticky top-32">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-black text-sm uppercase tracking-[0.2em] text-zinc-400">AKTİF ÜYELER</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping" />
-                <span className="text-emerald-500 text-[10px] font-black uppercase tracking-widest">
-                  {onlineUsers.length} CANLI
+          <div className="bg-zinc-900/60 backdrop-blur-3xl border-2 border-white/5 rounded-[3.5rem] p-10 h-fit sticky top-36 shadow-2xl overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-[#5856D6]" />
+            
+            <div className="flex items-center justify-between mb-10">
+              <h3 className="font-black text-xs uppercase tracking-[0.3em] text-zinc-500">CANLI OYUNCULAR</h3>
+              <div className="flex items-center gap-2.5 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping" />
+                <span className="text-emerald-500 text-[11px] font-black uppercase tracking-tighter">
+                  {onlineUsers.length} ONLINE
                 </span>
               </div>
             </div>
             
-            <div className="space-y-5">
+            <div className="space-y-6">
               {onlineUsers.map((u: any, i) => (
                 <motion.div 
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.1 }}
                   key={u.id || i} 
-                  className="flex items-center gap-4 group px-2 py-1"
+                  className="flex items-center gap-5 group"
                 >
                   <div className="relative">
-                    <AvatarDisplay avatarId={u.avatar_id} size="sm" />
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-zinc-900 shadow-lg" />
+                    <AvatarDisplay avatarId={u.avatar_id} size="sm" animate />
+                    <motion.div 
+                      animate={{ scale: [1, 1.3, 1] }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-[#121212] shadow-xl" 
+                    />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold text-zinc-100 truncate group-hover:text-indigo-400 transition-colors uppercase tracking-tight">{u.username}</p>
-                    <p className="text-[9px] font-bold text-zinc-600 uppercase tracking-widest">Savaş Arıyor</p>
+                    <p className="text-base font-black text-zinc-100 truncate group-hover:text-[#5856D6] transition-colors leading-none">{u.username}</p>
+                    <div className="flex items-center gap-2 mt-2">
+                       <span className="w-1.5 h-1.5 bg-[#FF9500] rounded-full" />
+                       <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Savaşa Hazır</p>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -221,63 +294,77 @@ export default function LobbyPage() {
 
       <AnimatePresence>
         {showCreateModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }}
               onClick={() => setShowCreateModal(false)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-md" 
+              className="absolute inset-0 bg-black/95 backdrop-blur-xl" 
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 40 }}
+              initial={{ opacity: 0, scale: 0.9, y: 100 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 40 }}
-              className="w-full max-w-md bg-zinc-900 border border-white/5 p-10 rounded-[3rem] relative z-10 shadow-2xl"
+              exit={{ opacity: 0, scale: 0.9, y: 100 }}
+              transition={{ type: "spring", damping: 20 }}
+              className="w-full max-w-lg bg-[#121212] border-2 border-white/10 p-12 rounded-[4rem] relative z-10 shadow-[0_0_100px_rgba(88,86,214,0.15)] overflow-hidden"
             >
-              <h3 className="text-3xl font-black mb-8 italic tracking-tighter text-white">ODA OLUŞTUR</h3>
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5856D6] to-[#FF9500]" />
+              <h3 className="text-4xl font-black mb-10 italic tracking-tighter text-white">ARENA KUR</h3>
               
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-zinc-500 mb-3 tracking-[0.3em] ml-1">ODA ADI</label>
+              <div className="space-y-10">
+                <div className="relative group">
+                  <label className="block text-[10px] font-black uppercase text-zinc-500 mb-4 tracking-[0.4em] ml-2">ARENA İSMİ GİR</label>
                   <input
                     type="text"
                     value={newRoomName}
                     onChange={(e) => setNewRoomName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/5 rounded-[1.5rem] py-4 px-6 focus:border-indigo-500/50 outline-none transition-all text-sm text-white"
-                    placeholder="Efsanevi bir isim seç..."
+                    className="w-full bg-white/5 border-2 border-white/5 rounded-[2rem] py-5 px-8 focus:border-[#5856D6]/50 focus:bg-white/10 outline-none transition-all text-base text-white font-black italic shadow-inner"
+                    placeholder="Korkutucu bir isim..."
                   />
                 </div>
                 
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <label className="block text-[10px] font-black uppercase text-zinc-500 tracking-[0.3em] ml-1">KİŞİ SAYISI</label>
-                    <span className="text-indigo-400 font-black text-sm">{maxPlayers} OYUNCU</span>
+                  <div className="flex justify-between items-center mb-6">
+                    <label className="block text-[10px] font-black uppercase text-zinc-500 tracking-[0.4em] ml-2">OYUNCU SAYISI</label>
+                    <span className="text-[#5856D6] font-black text-base italic">{maxPlayers} SAVAŞÇI</span>
                   </div>
-                  <input
-                    type="range"
-                    min="2"
-                    max="4"
-                    value={maxPlayers}
-                    onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
-                    className="w-full accent-indigo-500 bg-white/5 rounded-full h-2 appearance-none cursor-pointer"
-                  />
+                  <div className="px-2">
+                    <input
+                      type="range"
+                      min="2"
+                      max="4"
+                      value={maxPlayers}
+                      onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
+                      className="w-full accent-[#5856D6] bg-white/10 rounded-full h-3 appearance-none cursor-pointer"
+                    />
+                    <div className="flex justify-between mt-3 text-[10px] font-black text-zinc-700 px-1">
+                      <span>2</span>
+                      <span>3</span>
+                      <span>4</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="pt-6 flex gap-4">
-                  <button
+                <div className="pt-4 flex gap-5">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setShowCreateModal(false)}
-                    className="flex-1 px-6 py-4 bg-white/5 text-zinc-400 font-bold rounded-2xl hover:bg-white/10 transition-colors uppercase tracking-widest text-xs"
+                    className="flex-1 px-8 py-5 bg-white/5 text-zinc-500 font-black rounded-[2rem] hover:bg-white/10 hover:text-white transition-all uppercase tracking-[0.2em] text-xs border border-white/5"
                   >
-                    İPTAL
-                  </button>
-                  <button
+                    VAZGEÇ
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={createRoom}
                     disabled={createLoading || !newRoomName}
-                    className="flex-1 px-6 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-500 transition-all uppercase tracking-widest text-xs shadow-lg shadow-indigo-500/20 disabled:opacity-50"
+                    className="flex-1 px-8 py-5 bg-gradient-to-r from-[#5856D6] to-[#af52de] text-white font-black rounded-[2rem] transition-all uppercase tracking-[0.2em] text-xs shadow-2xl shadow-indigo-500/30 disabled:opacity-50 relative group overflow-hidden"
                   >
-                    {createLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'BAŞLAT'}
-                  </button>
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {createLoading ? <Loader2 className="w-6 h-6 animate-spin mx-auto text-white" /> : 'MEYDAN OKU'}
+                  </motion.button>
                 </div>
               </div>
             </motion.div>
@@ -297,4 +384,8 @@ function Gamepad2(props: any) {
       <line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15" y1="13" y2="13"/><line x1="18" x2="18" y1="11" y2="11"/><path d="M6.12 2.7a2 2 0 0 1 1.76 0l11.4 5.7c.6.3 1.1.8 1.4 1.4L22.1 14.5a3 3 0 0 1-1.8 4.1l-10.2 3.4a4.3 4.3 0 0 1-2.6 0L2.3 19.8A3 3 0 0 1 .5 15.7l1.7-4.7c.3-.6.8-1.1 1.4-1.4l2.5-6.9z"/>
     </svg>
   )
+}
+
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(' ');
 }
